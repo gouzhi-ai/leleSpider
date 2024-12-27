@@ -47,7 +47,7 @@ class SymbolabSpider(scrapy.Spider):
         }
 
         # start_urls = [f'https://www.symbolab.com/popular-{self.subject}?page={i}' for i in range(0, self.end_page)]
-        topics = {"pre-algebra": 1}
+        topics = {"pre-calculus": 10}
         for subject in topics:
             subject_text = subject
             subject_num = topics[subject]
