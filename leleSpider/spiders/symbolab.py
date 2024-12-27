@@ -88,6 +88,7 @@ class SymbolabSpider(scrapy.Spider):
             )
 
     def parse_details(self, response):
+        # 提取 详情页
         html_content = response.text
         item = SymbolabItem()
 

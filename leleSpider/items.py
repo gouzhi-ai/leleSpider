@@ -20,3 +20,4 @@ class ThecorestandardsItem(scrapy.Item):
     title = scrapy.Field()
     url = scrapy.Field()
     text = scrapy.Field()
+    subject = scrapy.Field()
