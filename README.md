@@ -9,3 +9,7 @@
 ### Symbolab
 - **描述**: 约有90万道题，不更新。
 - **链接**: [Symbolab](https://www.symbolab.com/popular-pre-algebra)
+
+### Thecorestandards
+- **描述**: 采集 各年级课程要求及知识点，不更新。
+- **链接**: [Thecorestandards](www.thecorestandards.org)
