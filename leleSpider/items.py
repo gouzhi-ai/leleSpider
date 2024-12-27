@@ -14,5 +14,9 @@ class SymbolabItem(scrapy.Item):
     explain = scrapy.Field()
     url = scrapy.Field()
     subject = scrapy.Field()
-
     pass
+
+class ThecorestandardsItem(scrapy.Item):
+    title = scrapy.Field()
+    url = scrapy.Field()
+    text = scrapy.Field()
