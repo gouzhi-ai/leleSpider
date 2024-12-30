@@ -7,7 +7,7 @@ import json
 topics = {
     "pre-algebra": 233,
     "algebra": 4737,
-    "word-problems": 141,  # 注意
+    "word-problems": 141,  # 注意 BUG
     "functions": 1324,
     "geometry": 257,
     "trigonometry": 451,
@@ -47,7 +47,12 @@ class SymbolabSpider(scrapy.Spider):
         }
 
         # start_urls = [f'https://www.symbolab.com/popular-{self.subject}?page={i}' for i in range(0, self.end_page)]
-        topics = {"pre-calculus": 10}
+        topics = {
+            "algebra": 4737,
+            "geometry": 257,
+            "trigonometry": 451,
+            "calculus": 2459,
+        }
         for subject in topics:
             subject_text = subject
             subject_num = topics[subject]
