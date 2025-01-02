@@ -23,8 +23,8 @@ class SymbolabSpider(scrapy.Spider):
     name = "symbolab"
     allowed_domains = ["www.symbolab.com"]
 
-    # subject = 'pre-calculus'
-    # end_page = topics[subject]
+    subject = 'pre-calculus'
+    end_page = topics[subject]
 
     def start_requests(self):
         headers = {
@@ -48,16 +48,13 @@ class SymbolabSpider(scrapy.Spider):
 
         # start_urls = [f'https://www.symbolab.com/popular-{self.subject}?page={i}' for i in range(0, self.end_page)]
         topics = {
-            "algebra": 4737,
-            "geometry": 257,
-            "trigonometry": 451,
-            "calculus": 2459,
+            "word-problems": 141,
         }
         for subject in topics:
-            subject_text = subject
-            subject_num = topics[subject]
-            for page in range(0, int(subject_num)):
-                url = f'https://www.symbolab.com/popular-{str(subject_text)}?page={page}'
+            self.subject = subject
+            self.end_page = topics[subject]
+            for page in range(0, int(self.end_page)):
+                url = f'https://www.symbolab.com/popular-{str(self.subject)}?page={page}'
                 yield scrapy.Request(url=url, callback=self.parse, headers=headers)
 
     def parse(self, response):
@@ -86,6 +83,15 @@ class SymbolabSpider(scrapy.Spider):
         for question_link in question_links:
             # print(link.text)
             link = question_link.find('a').attrs['href']
+
+            # debug : word-problem
+            if self.subject == "word-problems":
+                yield scrapy.Request(
+                    url=response.urljoin(link),
+                    headers=headers,
+                    callback=self.parse_word_problems
+                )
+
             yield scrapy.Request(
                 url=response.urljoin(link),
                 callback=self.parse_details,
@@ -153,4 +159,51 @@ class SymbolabSpider(scrapy.Spider):
 
         item['explain'] = explain
         # print(json.dumps(item))
+        yield item
+
+    def parse_word_problems(self, response):
+        # 专门处理 "word-problems" 这一学科的详情页
+        html_content = response.text
+        item = SymbolabItem()
+
+        item['url'] = response.url
+        item['subject'] = item['url'].split('/')[-1].rsplit('-', 1)[0]
+
+        soup = BeautifulSoup(html_content, 'html.parser')
+        script_tag = soup.find('script', {'id': '__NUXT_DATA__'})
+        json_data = json.loads(str(script_tag.string), strict=False)
+
+        data = []
+        for i in json_data:
+            if isinstance(i, str):
+                if i[0:7] == 'jypQO0p': continue
+                data.append(i)
+        json_data = data
+
+        # 求 question、answer
+        question = 'BUG'
+        answer = 'BUG'
+        # 求 explain
+        explain = []
+        for i in range(len(json_data)):
+            # print(i)
+            if json_data[i] == 'interim':
+                if '=' in json_data[i + 1]:
+                    question, answer = json_data[i + 1].split('=', 1)
+                    if answer.count('$') % 4 != 0:
+                        question = question + "$$"
+                        answer = "$$" + answer
+                elif 'quad' in json_data[i + 1]:
+                    print()
+                j = i
+                for k in range(j, len(json_data)):
+                    if json_data[k] == 'step': continue
+                    if json_data[k] == item['subject']: break
+                    explain.append(json_data[k])
+                break
+
+        item['question'] = question
+        item['answer'] = answer
+        item['explain'] = explain
+
         yield item
