@@ -188,22 +188,20 @@ class SymbolabSpider(scrapy.Spider):
         for i in range(len(json_data)):
             # print(i)
             if json_data[i] == 'interim':
-                if '=' in json_data[i + 1]:
-                    question, answer = json_data[i + 1].split('=', 1)
-                    if answer.count('$') % 4 != 0:
-                        question = question + "$$"
-                        answer = "$$" + answer
-                elif 'quad' in json_data[i + 1]:
-                    print()
-                j = i
+                question, answer = json_data[i + 1].split('<br/> <br/>', 1)
+
+                j = i+2
                 for k in range(j, len(json_data)):
                     if json_data[k] == 'step': continue
                     if json_data[k] == item['subject']: break
                     explain.append(json_data[k])
                 break
 
-        item['question'] = question
+        item['question'] = question+"?"
         item['answer'] = answer
         item['explain'] = explain
 
         yield item
+
+if __name__ == '__main__':
+    print()
